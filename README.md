@@ -1,6 +1,12 @@
-# MCA372D Go Programming Lab
+# MCA372D Go Programming Lab - Christ (Deemed to be University)
 
-Welcome to the MCA372D Go Programming Lab repository! This repository contains a collection of lab programs and assignments completed as part of the MCA372D course.
+Welcome to the MCA372D Go Programming Lab repository at Christ (Deemed to be University)! This repository contains a collection of lab programs and assignments completed as part of the MCA372D course offered at Christ (Deemed to be University).
+
+## About Christ (Deemed to be University)
+
+[Christ (Deemed to be University)](https://christuniversity.in/) is a renowned academic institution known for its commitment to excellence in education. Established in 1969, Christ University has grown to become a leading institution offering a wide range of undergraduate, postgraduate, and doctoral programs across various disciplines.
+
+The MCA372D course is a part of the university's curriculum, focusing on Go programming language, and this repository serves as a dedicated space to store and manage lab programs related to the course.
 
 ## Table of Contents
 
@@ -12,7 +18,7 @@ Welcome to the MCA372D Go Programming Lab repository! This repository contains a
 
 ## Introduction
 
-This repository is a centralized location for storing and managing lab programs related to Go programming language for the MCA372D course. The goal is to provide a well-organized structure for both storage and collaboration on programming assignments and labs.
+This repository is a centralized location for storing and managing lab programs related to Go programming language for the MCA372D course at Christ (Deemed to be University). The goal is to provide a well-organized structure for both storage and collaboration on programming assignments and labs.
 
 ## Lab Programs
 
