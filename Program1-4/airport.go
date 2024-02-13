@@ -1,13 +1,13 @@
 /*Program: Airport Management System
-  
-  Course: MCA372D Go Programming Lab 
 
-  Description: This program manages an airport with flights, planes and passengers. 
-  It includes functionalities to add a new flight, view all flights, search for a flight, 
+  Course: MCA372D Go Programming Lab
+
+  Description: This program manages an airport with flights, planes and passengers.
+  It includes functionalities to add a new flight, view all flights, search for a flight,
   update departure time, delete a flight and display all flights after performing CRUD operations.
 
   Author: Anupam Kumar 2347104
- */
+*/
 
 package main
 
@@ -15,13 +15,14 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 	"time"
 )
 
 // Constants
 const (
-	menuHeader         = "\n===== Airport Management System ====="
-	menuOptions        = "1. Add New Flight\n2. View All Flights\n3. Search for a Flight\n" +
+	menuHeader  = "\n===== Airport Management System ====="
+	menuOptions = "1. Add New Flight\n2. View All Flights\n3. Search for a Flight\n" +
 		"4. Update Departure Time\n5. Delete a Flight\n6. Display All Flights After Operations\n7. Exit"
 	invalidChoiceMsg   = "Invalid choice. Please enter a number between 1 and 7."
 	noFlightsAvailable = "No flights available."
@@ -44,6 +45,19 @@ func displayMenu() {
 	fmt.Print("Enter your choice (1-7): ")
 }
 
+// Function to validate if a flight number is in alphanumeric format
+func isValidFlightNumber(flightNumber string) bool {
+	trimmedFlightNumber := strings.TrimSpace(flightNumber)
+	matched, _ := regexp.MatchString("^[a-zA-Z0-9]+$", trimmedFlightNumber)
+	return matched
+}
+
+// Function to validate if the time format is in HH:mm
+func isValidTimeFormat(timeStr string) bool {
+	_, err := time.Parse("15:04", timeStr)
+	return err == nil
+}
+
 // Function to add a new flight to the system
 func addFlight() {
 	fmt.Println("\n===== Add New Flight =====")
@@ -52,6 +66,7 @@ func addFlight() {
 	// Get flight details from the user
 	fmt.Print("Enter Flight Number (alphanumeric): ")
 	fmt.Scanln(&newFlight.FlightNumber)
+	newFlight.FlightNumber = strings.TrimSpace(newFlight.FlightNumber)
 	if !isValidFlightNumber(newFlight.FlightNumber) {
 		fmt.Println("Invalid Flight Number format. Please use alphanumeric characters.")
 		return
@@ -68,6 +83,7 @@ func addFlight() {
 
 	fmt.Print("Enter Departure Time (HH:mm): ")
 	fmt.Scanln(&newFlight.Departure)
+	newFlight.Departure = strings.TrimSpace(newFlight.Departure)
 	if !isValidTimeFormat(newFlight.Departure) {
 		fmt.Println("Invalid time format. Please use the format HH:mm.")
 		return
@@ -140,6 +156,7 @@ func updateFlightDepartureTime() {
 			fmt.Print("Enter new Departure Time (HH:mm): ")
 			var newDepartureTime string
 			fmt.Scanln(&newDepartureTime)
+			newDepartureTime = strings.TrimSpace(newDepartureTime)
 			if !isValidTimeFormat(newDepartureTime) {
 				fmt.Println("Invalid time format. Please use the format HH:mm.")
 				return
@@ -208,16 +225,66 @@ func displayAllFlights() {
 	}
 }
 
-// Function to validate if a flight number is in alphanumeric format
-func isValidFlightNumber(flightNumber string) bool {
-	matched, _ := regexp.MatchString("^[a-zA-Z0-9]+$", flightNumber)
-	return matched
+// Function to generate a summary report of the airport
+func generateReport() {
+	fmt.Println("\n===== Airport Summary Report =====")
+
+	// Display additional calculations
+	fmt.Printf("Total Flights: %d\n", calculateTotalFlights())
+	fmt.Printf("Average Departure Time: %s\n", calculateAverageDepartureTime())
+
+	nextFlightNumber, nextFlightTime := findNextUpcomingFlight()
+	fmt.Printf("Next Upcoming Flight: %s at %s\n", nextFlightNumber, nextFlightTime)
 }
 
-// Function to validate if the time format is in HH:mm
-func isValidTimeFormat(timeStr string) bool {
-	_, err := time.Parse("15:04", timeStr)
-	return err == nil
+// Function to calculate the total number of flights
+func calculateTotalFlights() int {
+	return len(flights)
+}
+
+// Function to calculate the average departure time
+func calculateAverageDepartureTime() string {
+	if len(flights) == 0 {
+		return "N/A"
+	}
+
+	totalMinutes := 0
+	for _, flight := range flights {
+		departureTime, _ := time.Parse("15:04", flight.Departure)
+		totalMinutes += departureTime.Hour()*60 + departureTime.Minute()
+	}
+
+	averageMinutes := totalMinutes / len(flights)
+	averageTime := time.Date(0, 1, 1, averageMinutes/60, averageMinutes%60, 0, 0, time.UTC)
+
+	return averageTime.Format("15:04")
+}
+
+// Function to find the next upcoming flight
+func findNextUpcomingFlight() (string, string) {
+	if len(flights) == 0 {
+		return "N/A", "N/A"
+	}
+
+	now := time.Now()
+	var nextFlightTime time.Time
+	var nextFlightNumber string
+
+	for _, flight := range flights {
+		departureTime, _ := time.Parse("15:04", flight.Departure)
+		departureDateTime := time.Date(now.Year(), now.Month(), now.Day(), departureTime.Hour(), departureTime.Minute(), 0, 0, time.UTC)
+
+		if departureDateTime.After(now) && (nextFlightTime.IsZero() || departureDateTime.Before(nextFlightTime)) {
+			nextFlightTime = departureDateTime
+			nextFlightNumber = flight.FlightNumber
+		}
+	}
+
+	if nextFlightTime.IsZero() {
+		return "N/A", "N/A"
+	}
+
+	return nextFlightNumber, nextFlightTime.Format("15:04")
 }
 
 func main() {
@@ -251,6 +318,7 @@ func main() {
 			deleteFlight()
 		case 6:
 			displayAllFlights()
+			generateReport() // Display the summary report after operations
 		case 7:
 			fmt.Println("Exiting the Airport Management System. Goodbye!")
 			os.Exit(0)
